@@ -41,7 +41,10 @@ int main() {
 }
 
 void init() {
+
     window = new sf::RenderWindow(sf::VideoMode(1000, 1000), "Plotter");
+
+    window->setKeyRepeatEnabled(false); 
 
     pixel = new sf::RectangleShape;
 
@@ -147,15 +150,20 @@ void drawLine(int x1, int y1, int x2, int y2) {
 
 void events() {
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        double x, y;
-        x = sf::Mouse::getPosition(*window).x;
-        y = sf::Mouse::getPosition(*window).y;
+    static int mox = -1; 
+    static int moy = -1; 
 
-        zeroPoint->x = x;
-        zeroPoint->y = y;
+    static bool screenMoving = false; 
 
+    if (screenMoving) {
+        double x = sf::Mouse::getPosition(*window).x;
+        double y = sf::Mouse::getPosition(*window).y;
 
+        zeroPoint->x = zeroPoint->x + x - mox; 
+        zeroPoint->y = zeroPoint->y + y - moy;
+
+        mox = x; 
+        moy = y; 
     }
 
     sf::Event event;
@@ -163,6 +171,16 @@ void events() {
     {
         if (event.type == sf::Event::Closed)
             window->close();
+
+        if (event.type == sf::Event::MouseButtonPressed) {
+            screenMoving = true; 
+            mox = sf::Mouse::getPosition(*window).x; 
+            moy = sf::Mouse::getPosition(*window).y; 
+        }
+
+        if (event.type == sf::Event::MouseButtonReleased) {
+            screenMoving = false; 
+        }
 
         if (event.type == sf::Event::MouseWheelScrolled) {
             if (event.mouseWheel.x > 0) {
@@ -181,17 +199,17 @@ void events() {
 
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Left) {
-                zeroPoint->x += 50;
+                zeroPoint->x += widthFactor;
             }
             if (event.key.code == sf::Keyboard::Right) {
-                zeroPoint->x -= 50;
+                zeroPoint->x -= widthFactor;
             }
 
             if (event.key.code == sf::Keyboard::Up) {
-                zeroPoint->y += 50;
+                zeroPoint->y += heightFactor;
             }
             if (event.key.code == sf::Keyboard::Down) {
-                zeroPoint->y -= 50;
+                zeroPoint->y -= heightFactor;
             }
 
             if (event.key.code == sf::Keyboard::A) {
@@ -227,5 +245,5 @@ short sign(float x) {
 }
 
 float fun(float y, float x) {
-    return y - cos(x);
+    return y - 1/(1+pow(2.71,-x));
 }
