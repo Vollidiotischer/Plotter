@@ -111,6 +111,9 @@ void draw() {
     int w = (int)window->getSize().x;
     int h = (int)window->getSize().y;
 
+    double wf1 = - 1 / widthFactor; 
+    double hf1 = - 1 / heightFactor; 
+
     for (int x = 0; x < w; x += (pixelSize - 1)) { // 
 
         float kx = (x - zeroPoint->x) / widthFactor;
@@ -119,7 +122,7 @@ void draw() {
 
             float ky = (zeroPoint->y - y) / heightFactor + 1;
 
-            float result = sign(fun(ky - 1 / heightFactor, kx - 1 / widthFactor)) + sign(fun(ky - 1 / heightFactor, kx)) + sign(fun(ky, kx - 1 / widthFactor)) + sign(fun(ky, kx));
+            float result = sign(fun(ky + hf1, kx + wf1)) + sign(fun(ky + hf1, kx)) + sign(fun(ky, kx + wf1)) + sign(fun(ky, kx));
 
             if (result > -4 && result < 4) {
 
@@ -245,5 +248,5 @@ short sign(float x) {
 }
 
 float fun(float y, float x) {
-    return y - 1/(1+pow(2.71,-x));
+    return y - 1/(1+pow(2.71,-x)) * 4 + 2;
 }
